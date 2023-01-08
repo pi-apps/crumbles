@@ -57,7 +57,7 @@ flask run
 ## Deployment
 
 crumbles can be hosted on [pythonanywhere](https://www.pythonanywhere.com/). You have to register at pythonanywhere and upload the files.
-Additionally you have to use the __init__-pythonanywhere.py file within the flaskeddit-folder.
+Additionally you have to use the `__init__-pythonanywhere.py` file within the flaskeddit-folder.
 
 Then make following changes to the wsgi configuration file in the web-tab:
 ```
