@@ -1,0 +1,13 @@
+{% extends "layout.html" %} {% block content %}
+<h2 class="mb-3">Update Community</h2>
+<form
+  action="{{ url_for('community.update_community', name=name) }}"
+  method="POST"
+>
+  {{ form.csrf_token }}
+  <div class="form-group">
+    {{ form.description.label }} {{ form.description(class="form-control") }}
+  </div>
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends "layout.html" %} {% block content %}
+<div class="row">
+    <p>
+      <a href="{{ url_for('feed.feed') }}">My Feed</a> | <a href="{{ url_for('communities.communities') }}">Communities</a>
+    </p>
+</div>
+
+
+<div class="card">
+  <div class="card-header">
+    <a
+      class="text-dark"
+      href="{{ url_for('community.community', name=post.community_name) }}"
+      >f/{{ post.community_name }}</a
+    >
+  </div>
+  <div class="card-body">
+    <p class="card-text">
+      {{ post.community_description }}
+    </p>
+    <div class="container-fluid">
+      <div class="row">
+        <a
+          href="{{ url_for('reply.reply', name=post.community_name, title=post.title) }}"
+          class="btn btn-sm btn-primary mb-1"
+          >Reply</a
+        >
+      {% if current_user.is_authenticated %}
+          {% if (current_user.id == post.user_id) or (app_user.moderator == true) %}
+          <a> | </a>
+            <a
+              href="{{ url_for('post.update_post', name=post.community_name, title=post.title) }}"
+              class="btn btn-sm btn-primary mb-1"
+              >Update</a
+            >
+          <a> | </a>
+            <form
+              action="{{ url_for('post.delete_post', name=post.community_name, title=post.title) }}"
+              method="POST"
+            >
+              <button class="btn btn-sm btn-danger">
+                Delete
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<h2 class="mb-3">{{ post.title }}</h2>
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-2">
+      <div class="row">
+        <div class="col-2">
+          <ul class="list-group text-center border-0">
+            <li class="list-group-item py-1 my-1 border-0">
+              <form
+                action="{{ url_for('post.upvote_post', name=post.community_name, title=post.title) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▲"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+            <li class="list-group-item py-1 my-1 border-0">
+              <small>{{ post.votes }}</small>
+            </li>
+            <li class="list-group-item py-1 my-1 border-0">
+              <form
+                action="{{ url_for('post.downvote_post', name=post.community_name, title=post.title) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▼"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+          </ul>
+        </div>
+        <div class="col-10">
+          <div class="card-body">
+            <h4 class="card-title">
+              {{ post.title }}
+            </h4>
+            <h6 class="card-subtitle text-muted mb-3">
+              <small
+                >Posted on {{ post.date_created.strftime("%d/%m/%Y") }} by
+                <a
+                  class="text-muted"
+                  href="{{ url_for('user.app_user', username=post.username) }}"
+                  >u/{{ post.username }}</a
+                >
+              </small>
+            </h6>
+            <p class="card-text">
+              {{ post.post }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted ml-1">
+      Sort by: {% if tab == "recent" %} Recent /
+      <a
+        href="{{ url_for('post.top_post', name=post.community_name, title=post.title) }}"
+        >Top</a
+      >
+      {% elif tab == "top" %}
+      <a
+        href="{{ url_for('post.post', name=post.community_name, title=post.title) }}"
+        >Recent</a
+      >
+      / Top {% endif %}
+    </p>
+    <hr />
+    {% for reply in replies.items %}
+    <div class="card mb-2">
+      <div class="row">
+        <div class="col-2">
+          <ul class="list-group text-center border-0">
+            <li class="list-group-item py-1 border-0">
+              <form
+                action="{{ url_for('reply.upvote_reply', name=post.community_name, title=post.title, reply_id=reply.id) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▲"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+            <li class="list-group-item py-1 border-0">
+              <small>{{ reply.votes }}</small>
+            </li>
+            <li class="list-group-item py-1 border-0">
+              <form
+                action="{{ url_for('reply.downvote_reply', name=post.community_name, title=post.title, reply_id=reply.id) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▼"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+          </ul>
+        </div>
+        <div class="col-10">
+          <div class="card-body">
+            <p class="card-text">
+              {{ reply.reply }}
+            </p>
+            <h6 class="card-subtitle text-muted">
+              <small
+                >Replied on {{ reply.date_created.strftime("%d/%m/%Y") }} by
+                <a
+                  class="text-muted"
+                  href="{{ url_for('user.app_user', username=reply.username) }}"
+                  >u/{{ reply.username }}</a
+                >
+                {% if current_user.is_authenticated and current_user.id ==
+                reply.user_id %} &#183;
+                <a
+                  class="text-muted"
+                  href="{{ url_for('reply.update_reply', name=post.community_name, title=post.title, reply_id=reply.id) }}"
+                  >Edit</a
+                >
+                {% endif %}
+              </small>
+            </h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <nav class="my-2" aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if replies.prev_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ replies.prev_num }}">Previous</a>
+        </li>
+        {% endif %} {% if replies.next_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ replies.next_num }}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endblock %}

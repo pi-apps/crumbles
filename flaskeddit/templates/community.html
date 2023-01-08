@@ -1,0 +1,177 @@
+{% extends "layout.html" %} {% block content %}
+<div class="row">
+    <p>
+      <a href="{{ url_for('feed.feed') }}">My Feed</a> | <a href="{{ url_for('communities.communities') }}">Communities</a>
+    </p>
+</div>
+
+<div class="card">
+      <div class="card-header">
+        Community Details
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          {{ community.description }}
+        </p>
+        <div class="container-fluid">
+          <div class="row">
+            <a
+              href="{{ url_for('post.create_post', name=community.name) }}"
+              class="btn btn-sm btn-primary mb-1"
+              >Post</a
+            >
+          {% if current_user.is_authenticated and community_member != None %}
+            <a> | </a>
+            <form
+              action="{{ url_for('community.leave_community', name=community.name) }}"
+              method="POST"
+            >
+              <button class="btn btn-sm btn-primary mb-1">
+                Leave
+              </button>
+            </form>
+          {% elif current_user.is_authenticated %}
+            <a> | </a>
+            <form
+              action="{{ url_for('community.join_community', name=community.name) }}"
+              method="POST"
+            >
+              <button class="btn btn-sm btn-primary mb-1">
+                Join
+              </button>
+            </form>
+          {% endif %}
+          {% if current_user.is_authenticated %}
+              {% if (current_user.id == community.user_id) or (app_user.moderator == true) %}
+              <a> | </a>
+                <a
+                  href="{{ url_for('community.update_community', name=community.name) }}"
+                  class="btn btn-sm btn-primary mb-1"
+                  >Update</a
+                > <a> | </a>
+                <form
+                  action="{{ url_for('community.delete_community', name=community.name) }}"
+                  method="POST"
+                >
+                  <button class="btn btn-sm btn-danger mb-1">
+                    Delete
+                  </button>
+                </form>
+              {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% if tab == "recent" %}
+    <li class="breadcrumb-item active" aria-current="page">Recent</li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('community.top_community', name=community.name) }}"
+        >Top</a
+      >
+    </li>
+    {% elif tab == "top" %}
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('community.community', name=community.name) }}"
+        >Recent</a
+      >
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Top</li>
+    {% endif %}
+  </ol>
+</nav>
+<h2 class="mb-3">f/{{ community.name }}</h2>
+<div class="row">
+  <div class="col-12">
+    {% for post in posts.items %}
+    <div class="card mb-2">
+      <div class="row">
+        <div class="col-2">
+          <ul class="list-group text-center border-0">
+            <li class="list-group-item py-1 border-0">
+              <form
+                action="{{ url_for('post.upvote_post', name=community.name, title=post.title) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▲"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+            <li class="list-group-item py-1 border-0">
+              <small>{{ post.votes }}</small>
+            </li>
+            <li class="list-group-item py-1 border-0">
+              <form
+                action="{{ url_for('post.downvote_post', name=community.name, title=post.title) }}"
+                method="POST"
+              >
+                <small
+                  ><input
+                    class="border-0"
+                    type="submit"
+                    value="▼"
+                    {%
+                    if
+                    not
+                    current_user.is_authenticated
+                    %}disabled{%
+                    endif
+                    %}
+                /></small>
+              </form>
+            </li>
+          </ul>
+        </div>
+        <div class="col-10">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a
+                class="text-dark"
+                href="{{ url_for('post.post', name=community.name, title=post.title) }}"
+                >{{ post.title }}</a
+              >
+            </h5>
+            <h6 class="card-subtitle text-muted">
+              <small
+                >Posted on {{ post.date_created.strftime("%d/%m/%Y") }} by
+                <a
+                  class="text-muted"
+                  href="{{ url_for('user.app_user', username=post.username) }}"
+                  >u/{{ post.username }}</a
+                ></small
+              >
+            </h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <nav class="my-2" aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if posts.prev_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.prev_num }}">Previous</a>
+        </li>
+        {% endif %} {% if posts.next_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ posts.next_num }}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endblock %}

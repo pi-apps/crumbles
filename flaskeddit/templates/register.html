@@ -1,0 +1,35 @@
+{% extends "layout.html" %} {% block content %}
+<h2 class="mb-3">Register</h2>
+<form action="{{ url_for('auth.register') }}" method="POST">
+  {{ form.csrf_token }}
+  <div class="form-group">
+    {{ form.username.label }} {% if form.username.errors %} {{
+    form.username(class="form-control is-invalid") }} {% for error in
+    form.username.errors %}
+    <div class="invalid-feedback">
+      {{ error }}
+    </div>
+    {% endfor %} {% else %} {{ form.username(class="form-control") }} {% endif
+    %}
+  </div>
+  <div class="form-group">
+    {{ form.password.label }} {% if form.password.errors %} {{
+    form.password(class="form-control is-invalid") }} {% for error in
+    form.password.errors %}
+    <div class="invalid-feedback">
+      {{ error }}
+    </div>
+    {% endfor %} {% else %} {{ form.password(class="form-control") }} {% endif
+    %}
+  </div>
+  <div class="form-group">
+    {{ form.confirm_password.label }} {{
+    form.confirm_password(class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ form.email.label }} {{
+    form.email(class="form-control") }}
+  </div>
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}

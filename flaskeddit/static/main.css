@@ -1,0 +1,12 @@
+.full-height {
+  height: auto;
+  min-height: 90vh;
+}
+
+.fifth-height {
+  height: 20vh;
+}
+
+.is-link:hover {
+  opacity: 0.6;
+}

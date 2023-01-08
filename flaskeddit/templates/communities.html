@@ -1,0 +1,82 @@
+{% extends "layout.html" %} {% block content %}
+<div class="row">
+    <p>
+      <a href="{{ url_for('feed.feed') }}">My Feed</a> | <a href="{{ url_for('communities.communities') }}">Communities</a>
+    </p>
+</div>
+<div class="card">
+  <div class="card-header">
+    Communities
+  </div>
+  <div class="card-body">
+    <p class="card-text">
+      Find a subcrumble with a topic you're interested in or create one for yourself.
+    </p>
+    <a
+      href="{{ url_for('community.create_community') }}"
+      class="btn btn-sm btn-primary"
+      >Create</a
+    >
+  </div>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% if tab == "recent" %}
+    <li class="breadcrumb-item active" aria-current="page">Recent</li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('communities.top_communities') }}">Top</a>
+    </li>
+    {% elif tab == "top" %}
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('communities.communities') }}">Recent</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Top</li>
+    {% endif %}
+  </ol>
+</nav>
+<h2 class="mb-3">Communities</h2>
+<div class="row">
+  <div class="col-12">
+    {% for community in communities.items %}
+    <div class="card mb-2">
+      <div class="card-body">
+        <h5 class="card-title">
+          <a
+            class="text-dark"
+            href="{{ url_for('community.community', name=community.name) }}"
+            >f/{{ community.name }}</a
+          >
+        </h5>
+        <h6 class="card-subtitle text-muted">
+          <small
+            >Created on {{ community.date_created.strftime("%d/%m/%Y") }} by
+            <a
+              class="text-muted"
+              href="{{ url_for('user.app_user', username=community.username) }}"
+              >u/{{ community.username }}</a
+            ></small
+          >
+        </h6>
+      </div>
+    </div>
+    {% endfor %}
+    <nav class="my-2" aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if communities.prev_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ communities.prev_num }}"
+            >Previous</a
+          >
+        </li>
+        {% endif %} {% if communities.next_num %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ communities.next_num }}">Next</a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
+</div>
+{% endblock %}
