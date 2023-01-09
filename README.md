@@ -41,7 +41,7 @@ git clone https://github.com/pi-apps/crumbles.git
 Setup a `virtualvenv` and use `pip` to install the project dependencies.
 
 ```sh
-cd flaskeddit
+cd crumbles
 python3 -m virualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
