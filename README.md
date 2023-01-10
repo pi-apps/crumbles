@@ -44,7 +44,7 @@ Setup a `virtualvenv` and use `pip` to install the project dependencies.
 cd crumbles
 python3 -m virualenv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Set the `FLASK_APP` environment variable, create the SQLite database, and start the app. Now you can give the application a try at [http://localhost:5000](http://localhost:5000)!

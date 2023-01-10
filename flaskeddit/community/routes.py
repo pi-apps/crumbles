@@ -21,6 +21,7 @@ def community(name):
                 community.id, current_user.id
             )
             user, email, moderator = user_service.get_user(current_user.username)
+            isModerator = user.moderator
             return render_template(
                 "community.html",
                 tab="recent",
@@ -28,6 +29,7 @@ def community(name):
                 posts=posts,
                 community_member=community_member,
                 app_user=user,
+                isModerator = isModerator,
                 )
         else:
             return render_template(
@@ -55,15 +57,24 @@ def top_community(name):
             community_member = community_service.get_community_member(
                 community.id, current_user.id
             )
-            isModerator = user_service.get_user(current_user.username).moderator
-        return render_template(
+            user, email, moderator = user_service.get_user(current_user.username)
+            isModerator = user.moderator
+            return render_template(
+                "community.html",
+                tab="top",
+                community=community,
+                posts=posts,
+                community_member=community_member,
+                isModerator = isModerator,
+            )
+        else:
+            return render_template(
             "community.html",
             tab="top",
             community=community,
             posts=posts,
             community_member=community_member,
-            isModerator = isModerator,
-        )
+            )
     else:
         abort(404)
 

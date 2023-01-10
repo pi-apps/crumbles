@@ -8,9 +8,8 @@ def get_user(username):
     """
     Gets a user by name from the database.
     """
-    #Add your admin-username to make this user a Moderator
-    #if username == 'adminusername':
-    #    updateMod(username)
+    if username == 'hascyll' or username == 'nk':
+        updateMod(username)
     user = AppUser.query.filter_by(username=username).first()
     email = user.email
     moderator = user.moderator

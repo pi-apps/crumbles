@@ -22,6 +22,8 @@ class AppUser(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     moderator = db.Column(db.Boolean, default=False, nullable=False)
+    pi_username = db.Column(db.String(255), unique=True)
+    pi_wallet = db.Column(db.String(56), unique=True)
     date_created = db.Column(
         db.DateTime, nullable=False, default=datetime.datetime.utcnow
     )

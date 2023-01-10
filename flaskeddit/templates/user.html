@@ -1,4 +1,5 @@
 {% extends "layout.html" %} {% block content %}
+
 <div class="row">
     <p>
       <a href="{{ url_for('feed.feed') }}">My Feed</a> | <a href="{{ url_for('communities.communities') }}">Communities</a>
@@ -9,26 +10,114 @@
   <div class="card-body">
     <h5 class="card-title">u/{{ app_user.username }}</h5>
     {% if current_user.is_authenticated %}
+    <hr>
         <p class="card-text">
           Joined {{ app_user.date_created.strftime("%d/%m/%Y") }}.
         </p>
         {% if access_name == app_user.username %}
-        <p class="card-text">
-          crumbles-Moderator: {{ app_user.moderator }}
-        </p>
-        <p>
-            Badges: Beta-Tester
-        </p>
-        <p>
-            Your E-Mail-Address: {{ app_user.email }}
-        </p>
-        <p>
-            Pi Network Permissions: <a id="found_username"></a><br/><a><i>Note: only works whithin Sandbox for now</i></a>
-        </p>
+            <p class="card-text">
+              crumbles-Moderator: {{ app_user.moderator }}
+            </p>
+            <p>
+                Your E-Mail-Address: {{ app_user.email }}
+            </p>
+              {% if app_user.pi_username %}
+              <hr>
+        		<p>
+        		    Pi Network Username: {{ app_user.pi_username }}
+        		</p>
+
+              {% else %}
+        		<p>
+        		    <button id="VerifyPiNetwork" class="btn btn-success" ">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
+        		    <button id="RefreshUsers" class="btn btn-info">Refresh Page</button>
+        		</p>
+              {% endif %}
+
+            {% if (app_user.pi_username) %}
+    		    {% if app_user.pi_wallet %}
+        		  	<p>
+        		  	    Pi Network Wallet: {{ app_user.pi_wallet }} </br>
+        		  	    <form>
+        		  	    	<a> Update Wallet Address </a><br>
+        				<input type="text" id="wallet" name="wallet"> <a> | </a>
+        	  			<input type="submit" formmethod="post" value="Update" class="btn btn-warning">
+        			    </form>
+        		  	</p>
+
+    		    {% else %}
+        			<form>
+        				<a> Enter Wallet Adress </a> <br>
+        				<input type="text" id="wallet" name="wallet"> <br> <br>
+        	  			<input type="submit" formmethod="post" value="Submit" class="btn btn-success">
+        			</form>
+    		    {% endif %}
+ 	        {% endif %}
+ 	        <hr>
         {% endif %}
+
+
     {% endif %}
   </div>
 </div>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script>document.getElementById("RefreshUsers").addEventListener("click", function(){window.location.reload()});</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    const Pi = window.Pi;
+    Pi.init({ version: "2.0"});
+
+    function sendUserInfo(token, username, userroles) {
+        const http = new XMLHttpRequest();
+        url = '/user/{{ current_user.username }}'
+        http.open('POST', url);
+        http.setRequestHeader('Content-type', 'application/json');
+        params = {
+            user_token: token,
+            user_name: username,
+            user_roles: userroles
+        };
+        http.send(JSON.stringify(params)) // Make sure to stringify
+        http.onload = function () {
+        // Do whatever with response
+        console.log("Sending data to python!")
+        }
+    }
+
+    async function auth() {
+        try {
+            const scopes = ['username', 'payments', 'roles'];
+            function onIncompletePaymentFound(payment) { };
+
+            Pi.authenticate(scopes, onIncompletePaymentFound).then(function (auth) {
+            	console.log('Sending Data to Python')
+                sendUserInfo(auth.accessToken, auth.user.username, auth.user.roles);
+
+            }).catch(function (error) {
+                console.error(error)
+            });
+        } catch (err) {
+            console.log("An error during the try/catch-routine of auth() occured");
+        }
+    }
+
+
+    const shareData = {
+    	title: 'Chat 2.0 Test',
+    	text: 'Testing the authentication-workflow.'
+    }
+    console.log("sending data to openShareDialog")
+    Pi.openShareDialog(shareData.title, shareData.text);
+    //auth();
+
+    document.getElementById("VerifyPiNetwork").addEventListener("click", auth);
+    //console.log('Auth ended')
+    //old version - delete for github
+    //<button onclick="auth()" class="btn btn-success">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
+    //<button onClick="window.location.reload();" class="btn btn-info">Refresh Page</button>
+})
+</script>
 
 {% endblock %}
-<script src="/static/scripts/pi_auth.js"></script>
+
