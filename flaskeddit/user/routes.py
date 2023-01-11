@@ -15,16 +15,28 @@ def app_user(username):
     """
     if request.method == 'POST':
         try:
-            try:
+            try:	
                 content = request.json
-                if len(content) == 3 and content['user_name']:
-                    print('Log: received data for user ' + str(current_user.username) + ', Pi Network Username: ' + str(content['user_name']))
-                    verifyWithPi(content)
+                print(content)
+                print(type(content))
+                print(content['action'])
+                try:
+                    if content['user_name']:
+                        print('Log: received data for user ' + str(current_user.username) + ', Pi Network Username: ' + str(content['user_name']))
+                        verifyWithPi(content)
+                except: 
+                    pass
+                try:
+                    if str(content['action']) == 'approve' or str(content['action']) == 'complete':
+                        verifyPayments(content)
+                except: 
+                    pass
             except:
                 pass
             try:
                 content = request.form['wallet']
-                updateWallet(content)
+                if len(content) == 56 and content[0] == 'G':
+                    updateWallet(content)	
             except:
                 pass
         except:
@@ -55,6 +67,23 @@ def verifyWithPi(content):
         if server_data['roles'][0] == 'moderator':
             app_user.moderator = True
         db.session.commit()
+     
+def verifyPayments(content):
+    """
+    Verifies the Pi Network data the user sent with the backend-API
+    User-content: [user_token, user_name, user_roles]
+    """
+    baseURL = str(Config.PLATFORM_API_URL)
+    authentication = 'Key ' + str(Config.PI_API_KEY)
+    header = {'Authorization': authentication}  
+    if str(content['action']) == 'approve':
+        url = baseURL + '/v2/payments/' + content['paymentId'] + '/approve'
+        data = {}
+    if str(content['action']) == 'complete':
+        url = baseURL + '/v2/payments/' + content['paymentId'] + '/complete'
+        data = {'txid': content['txid']}
+    
+    request_payment = requests.post(url, json=data, headers=header)
 
 
 def updateWallet(wallet):
