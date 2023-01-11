@@ -29,8 +29,8 @@
 
               {% else %}
         		<p>
-        		    <button id="VerifyPiNetwork" class="btn btn-success" ">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
-        		    <button id="RefreshUsers" class="btn btn-info">Refresh Page</button>
+        		    <button id="VerifyPiNetwork" name="VerifyPiNetwork" class="btn btn-success">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
+        		    <button id="RefreshUsers" name="RefreshUsers" class="btn btn-info">Refresh Page</button>
         		</p>
               {% endif %}
 
@@ -52,6 +52,8 @@
         	  			<input type="submit" formmethod="post" value="Submit" class="btn btn-success">
         			</form>
     		    {% endif %}
+    		    <hr>
+    		    <center><button id="DonatePiToCrumbles" name ="DonatePiToCrumbles" class="btn btn-success">Donate 1 &pi; to Crumbles</button><br><i>Note: only works within the Pi Browser</i></center>
  	        {% endif %}
  	        <hr>
         {% endif %}
@@ -61,12 +63,12 @@
   </div>
 </div>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script>document.getElementById("RefreshUsers").addEventListener("click", function(){window.location.reload()});</script>
+
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
 $(document).ready(function () {
     const Pi = window.Pi;
-    Pi.init({ version: "2.0"});
+    Pi.init({ version: "2.0" });
 
     function sendUserInfo(token, username, userroles) {
         const http = new XMLHttpRequest();
@@ -81,7 +83,26 @@ $(document).ready(function () {
         http.send(JSON.stringify(params)) // Make sure to stringify
         http.onload = function () {
         // Do whatever with response
-        console.log("Sending data to python!")
+        console.log("Sending data to Backend!")
+        }
+    }
+
+    function sendPaymentDataBackend(data) {
+        const http = new XMLHttpRequest();
+        url = '/user/{{ current_user.username }}'
+        http.open('POST', url);
+        http.setRequestHeader('Content-type', 'application/json');
+        params = {
+            action: data['action'],
+            app_client: data['app_client'],
+            paymentId: data['paymentId'],
+            txid: data['txid']
+        };
+        console.log(params)
+        http.send(JSON.stringify(params)) // Make sure to stringify
+        http.onload = function () {
+        // Do whatever with response
+        console.log("Sending data to Backend!")
         }
     }
 
@@ -102,22 +123,81 @@ $(document).ready(function () {
         }
     }
 
+    async function authenticate() {
+        try {
+            const scopes = ['username', 'payments', 'roles'];
+            function onIncompletePaymentFound(payment) { };
+
+            Pi.authenticate(scopes, onIncompletePaymentFound).then(function (authenticate) {
+		console.log(authenticate.user)
+            }).catch(function (error) {
+                console.error(error)
+            });
+        } catch (err) {
+            console.log("An error during the try/catch-routine of authenticate() occured");
+        }
+    }
+
+    async function transfer() {
+    	console.log("Entered Payment Routine");
+
+	    try {
+	    	console.log("creatingPayment")
+		const payment = Pi.createPayment({
+		  // Amount of π to be paid:
+
+		  amount: 1.00,
+		  // An explanation of the payment
+		  memo: "Crumbles Test Payment",
+		  // An arbitrary developer-provided metadata object
+		  metadata: { paymentType: "Crumbles Test Payment" },
+		}, {
+		  // Callbacks you need to implement - read more about those in the detailed docs linked below:
+		  onReadyForServerApproval: function(paymentId) {
+		      var data = {
+		                'action': 'approve',
+		                'paymentId': paymentId,
+		                'txid': '',
+		                'app_client': 'auth_example'
+		            };
+		      console.log("Sending data to backend")
+		      sendPaymentDataBackend(data);
+		  },
+		  onReadyForServerCompletion: function(paymentId, txid) {
+		        var data = {
+		            'action': 'complete',
+		            'paymentId': paymentId,
+		            "txid": txid,
+		            'app_client': 'auth_example'
+		        };
+		        sendPaymentDataBackend(data);
+		  },
+		  onCancel: function(paymentId) { console.log('Payment Canceled') },
+		  onError: function(error, payment) { console.log('Payment Error') },
+		});
+	    } catch(err) {
+
+		console.log(err);
+		// Technic
+		}
+	}
+
 
     const shareData = {
-    	title: 'Chat 2.0 Test',
+    	title: 'Crumbles Test',
     	text: 'Testing the authentication-workflow.'
     }
     console.log("sending data to openShareDialog")
     Pi.openShareDialog(shareData.title, shareData.text);
-    //auth();
-
-    document.getElementById("VerifyPiNetwork").addEventListener("click", auth);
-    //console.log('Auth ended')
-    //old version - delete for github
-    //<button onclick="auth()" class="btn btn-success">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
-    //<button onClick="window.location.reload();" class="btn btn-info">Refresh Page</button>
+    authenticate();
+    try {
+    	document.getElementById("VerifyPiNetwork").addEventListener("click", auth);
+    	document.getElementById("RefreshUsers").addEventListener("click", function(){window.location.reload()});
+    } catch(err) {console.log("User authentication not available")}
+    document.getElementById("DonatePiToCrumbles").addEventListener("click", transfer);
 })
 </script>
 
 {% endblock %}
+
 
