@@ -2,7 +2,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from flaskeddit.auth import auth_blueprint, auth_service
-from flaskeddit.auth.forms import LoginForm, RegisterForm
+from flaskeddit.auth.forms import LoginForm, RegisterForm, ResetPasswordForm
 
 
 @auth_blueprint.route("/register", methods=["GET", "POST"])
@@ -45,6 +45,21 @@ def login():
             return redirect(url_for("auth.login"))
     return render_template("login.html", form=form)
 
+@auth_blueprint.route("/recoverpassword", methods=["GET", "POST"])
+def recoverpassword():
+    """
+    Route for resetting a user password. On a GET request, it returns the recover form. On a POST
+    request, it handles the password reset
+    """
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        reset_successful = auth_service.reset_password(
+            form.username.data, form.email.data
+        )
+        if reset_successful:
+            flash("Successfully recovered password. Please check your email for more details", "primary")
+            return redirect(url_for("auth.login"))
+    return render_template("recoverpassword.html", form=form)
 
 @auth_blueprint.route("/logout", methods=["POST"])
 @login_required
