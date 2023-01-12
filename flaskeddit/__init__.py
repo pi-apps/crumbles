@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 
 from flaskeddit.config import Config
 
@@ -8,7 +9,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "danger"
-
+mail = Mail()
 
 def create_app(config=Config):
     """
@@ -20,6 +21,14 @@ def create_app(config=Config):
 
     db.init_app(app)
     login_manager.init_app(app)
+    
+    app.config['MAIL_SERVER']= Config.mail_server
+    app.config['MAIL_PORT'] = Config.mail_port
+    app.config['MAIL_USERNAME'] = Config.mail_username
+    app.config['MAIL_PASSWORD'] = Config.mail_password
+    app.config['MAIL_USE_TLS'] = Config.mail_use_tls
+    app.config['MAIL_USE_SSL'] = Config.mail_use_ssl
+    mail = Mail(app)
 
     from flaskeddit.auth import auth_blueprint
     from flaskeddit.communities import communities_blueprint
