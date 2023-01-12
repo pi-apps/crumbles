@@ -194,7 +194,9 @@ $(document).ready(function () {
     	document.getElementById("VerifyPiNetwork").addEventListener("click", auth);
     	document.getElementById("RefreshUsers").addEventListener("click", function(){window.location.reload()});
     } catch(err) {console.log("User authentication not available")}
-    document.getElementById("DonatePiToCrumbles").addEventListener("click", transfer);
+    try {
+        document.getElementById("DonatePiToCrumbles").addEventListener("click", transfer);
+    } catch(err) {console.log("User donation not available")}
 })
 </script>
 
