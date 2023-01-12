@@ -3,13 +3,14 @@ from passlib.hash import bcrypt
 
 from flaskeddit import db
 from flaskeddit.models import AppUser
+from flaskeddit.config import Config
 
 
 def register_user(username, password, email):
     """
     Hashes the given password and registers a new user in the database.
     """
-    hashed_password = bcrypt.hash(password)
+    hashed_password = bcrypt.hash(password + Config.Server_SALT)
     email = email
     app_user = AppUser(username=username.lower(), password=hashed_password, email=email)
     db.session.add(app_user)
@@ -22,7 +23,8 @@ def log_in_user(username, password):
     logs a user in.
     """
     app_user = AppUser.query.filter_by(username=username.lower()).first()
-    if app_user and bcrypt.verify(password, app_user.password):
+    server_password = password + Config.Server_SALT
+    if app_user and bcrypt.verify(server_password, app_user.password):
         login_user(app_user)
         return True
     else:
