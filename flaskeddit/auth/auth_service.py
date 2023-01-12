@@ -1,10 +1,12 @@
 from flask_login import login_user, logout_user
+from flask_mail import Mail, Message
 from passlib.hash import bcrypt
 
-from flaskeddit import db
+from flaskeddit import db, mail
 from flaskeddit.models import AppUser
 from flaskeddit.config import Config
 
+import secrets
 
 def register_user(username, password, email):
     """
@@ -16,6 +18,37 @@ def register_user(username, password, email):
     db.session.add(app_user)
     db.session.commit()
 
+ def reset_password(username, email):
+    """
+    Generates a new password for a user and sends it to his/her email address.
+    Note: There is no routine to check if the e-mail address is valid!
+    """
+
+    #find the user
+    app_user = AppUser.query.filter_by(username=username.lower()).first()
+
+    #If a user is found:
+    if app_user:
+        user_mail = app_user.email
+
+        #generate a new random password
+        password_length = 13
+        new_password = secrets.token_urlsafe(password_length)
+
+        #send the password
+        recipient = []
+        recipient.append(user_mail)
+        recover_msg = Message('Reset crumbles password', sender = '$ADD-HERE-YOUR-EMAIL-ADDRESS', recipients = recipient)
+        recover_msg.body = 'Dear user ' + str(username) + '\n\nThank you very much for testing this service!\n\nYour new password is: ' + str(new_password) + '\n\nNote: this is an automated email. Please do not respond.'
+
+        mail.send(recover_msg)
+
+        #updating the user-data after successful send
+        app_user.password = bcrypt.hash(new_password + Config.Server_SALT) #here add salt!
+        db.session.commit()
+        return True
+    else:
+        return False
 
 def log_in_user(username, password):
     """
