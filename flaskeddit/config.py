@@ -18,3 +18,11 @@ class Config:
 
     # Platform API
     PLATFORM_API_URL = 'https://api.minepi.com'
+    
+    #Mail Server configuration
+    mail_server = #add 'smtp.$your-e-mail-hoster'
+    mail_port = #add port
+    mail_username = #add username
+    mail_password = #add passwort
+    mail_use_tls = False
+    mail_use_ssl = True
