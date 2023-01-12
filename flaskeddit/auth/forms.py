@@ -37,13 +37,13 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     """Form for logging in a user."""
-
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log In")
 
-class UpdateForm(FlaskForm):
-    """Form for logging in a user."""
-
-    roles = SubmitField("Check Status")
+class ResetPasswordForm(FlaskForm):
+    """Form for resetting a password."""
+    username = StringField("Username", validators=[DataRequired()])
+    email = StringField("E-Mail", validators=[DataRequired()])
+    submit = SubmitField("Reset Password")
 
