@@ -8,7 +8,7 @@ def get_user(username):
     """
     Gets a user by name from the database.
     """
-    if username == 'hascyll' or username == 'nk':
+    if username == 'admin_user':
         updateMod(username)
     user = AppUser.query.filter_by(username=username).first()
     email = user.email
