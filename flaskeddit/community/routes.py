@@ -65,6 +65,7 @@ def top_community(name):
                 community=community,
                 posts=posts,
                 community_member=community_member,
+                app_user=user,
                 isModerator = isModerator,
             )
         else:
