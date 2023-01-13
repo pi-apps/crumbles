@@ -1,4 +1,4 @@
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, current_user
 from flask_mail import Mail, Message
 from passlib.hash import bcrypt
 
@@ -63,6 +63,34 @@ def log_in_user(username, password):
     else:
         return False
 
+def changeEmail(email, password):
+    """
+    Lets a user change the used email-address.
+    """
+    username = current_user.username
+    app_user = AppUser.query.filter_by(username=username.lower()).first()
+    server_password = password + Config.Server_SALT
+    if app_user and bcrypt.verify(server_password, app_user.password):
+        app_user.email = email
+        db.session.commit()
+        return True
+    else:
+        return False
+
+def changePassword(old_password, new_password):
+    """
+    Lets a user change the used email-address.
+    """
+    username = current_user.username
+    app_user = AppUser.query.filter_by(username=username.lower()).first()
+    old_server_password = old_password + Config.Server_SALT
+    if app_user:
+        if bcrypt.verify(old_server_password, app_user.password):
+            app_user.password = bcrypt.hash(new_password + Config.Server_SALT)
+            db.session.commit()
+            return True
+    else:
+        return False
 
 def log_out_user():
     """
