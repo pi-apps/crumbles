@@ -2,7 +2,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from flaskeddit.auth import auth_blueprint, auth_service
-from flaskeddit.auth.forms import LoginForm, RegisterForm, ResetPasswordForm
+from flaskeddit.auth.forms import LoginForm, RegisterForm, ResetPasswordForm, ChangePasswordForm, ChangeEmailForm
 
 
 @auth_blueprint.route("/register", methods=["GET", "POST"])
@@ -60,6 +60,40 @@ def recoverpassword():
             flash("Successfully recovered password. Please check your email for more details", "primary")
             return redirect(url_for("auth.login"))
     return render_template("recoverpassword.html", form=form)
+
+@auth_blueprint.route("/changepassword", methods=["GET", "POST"])
+@login_required
+def changepassword():
+    """
+    Route for changing a user password. On a GET request, it returns the change form. On a POST
+    request, it handles the password change.
+    """
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        changepw_successful = auth_service.changePassword(
+            form.old_password.data, form.new_password.data
+        )
+        if changepw_successful:
+            flash("Successfully changed password!", "primary")
+            return redirect(url_for("feed.feed"))
+    return render_template("changepassword.html", form=form)
+
+@auth_blueprint.route("/changeemail", methods=["GET", "POST"])
+@login_required
+def changeemail():
+    """
+    Route for changing a user email. On a GET request, it returns the change form. On a POST
+    request, it handles the email change.
+    """
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        changemail_successful = auth_service.changeEmail(
+            form.email.data, form.password.data
+        )
+        if changemail_successful:
+            flash("Successfully changed E-Mail!", "primary")
+            return redirect(url_for("feed.feed"))
+    return render_template("changeemail.html", form=form)
 
 @auth_blueprint.route("/logout", methods=["POST"])
 @login_required
