@@ -9,6 +9,7 @@ Based on [flaskeddit](https://github.com/aqche/flaskeddit) by - **aqche** - [aqc
 ## Features
 
 - Registration and authentication.
+- Reset Password via Email.
 - Create communities.
 - Create community posts.
 - Reply to community posts.
