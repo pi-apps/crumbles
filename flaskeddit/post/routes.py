@@ -34,7 +34,11 @@ def top_post(name, title):
     post = post_service.get_post_with_votes(title, name)
     if post:
         replies = post_service.get_post_replies(post.id, page, True)
-        return render_template("post.html", tab="top", post=post, replies=replies)
+        if current_user.is_authenticated:
+            user, email, moderator = user_service.get_user(current_user.username)
+            return render_template("post.html", tab="top", post=post, replies=replies, app_user=user)
+        else:
+            return render_template("post.html", tab="top", post=post, replies=replies)
     else:
         abort(404)
 
