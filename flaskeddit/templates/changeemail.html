@@ -1,0 +1,16 @@
+{% extends "layout.html" %} {% block content %}
+<h2 class="mb-3">Change Email</h2>
+<form action="{{ url_for('auth.changeemail') }}" method="POST">
+  {{ form.csrf_token }}
+  <div class="form-group">
+    {{ form.email.label }} {{
+    form.email(class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ form.password.label }} {{
+    form.password(class="form-control") }}
+  </div>
+
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}
