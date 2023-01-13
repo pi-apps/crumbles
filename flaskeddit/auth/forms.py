@@ -41,6 +41,27 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log In")
 
+class ChangeEmailForm(FlaskForm):
+    """Form for changing the email of a user."""
+
+    email = StringField("Email", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Confirm new Email")
+
+class ChangePasswordForm(FlaskForm):
+    """Form for logging in a user."""
+    old_password = PasswordField("Old Password", validators=[DataRequired()])
+    new_password = PasswordField(
+        "New Password",
+        validators=[
+            DataRequired(),
+            EqualTo("confirm_newpassword", message="Passwords must match."),
+            Length(min=6),
+        ],
+    )
+    confirm_newpassword = PasswordField("Confirm Password", validators=[DataRequired()])
+    submit = SubmitField("Confirm new Password")
+    
 class ResetPasswordForm(FlaskForm):
     """Form for resetting a password."""
     username = StringField("Username", validators=[DataRequired()])
