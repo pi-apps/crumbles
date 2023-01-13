@@ -21,6 +21,8 @@
             <p>
                 Your E-Mail-Address: {{ app_user.email }}
             </p>
+            <hr>
+            <a href="{{ url_for('auth.changeemail') }}">Change Email</a> | <a href="{{ url_for('auth.changepassword') }}">Change Password</a>
               {% if app_user.pi_username %}
               <hr>
         		<p>
@@ -29,8 +31,10 @@
 
               {% else %}
         		<p>
-        		    <button id="VerifyPiNetwork" name="VerifyPiNetwork" class="btn btn-success">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br>
-        		    <button id="RefreshUsers" name="RefreshUsers" class="btn btn-info">Refresh Page</button>
+        		    <center><button id="VerifyPiNetwork" name="VerifyPiNetwork" class="btn btn-success">Verify your data with Pi Network</button><br><a><i>Note: only works within the Pi Browser and requires some time (about 5 seconds). After 5 seconds please refresh the page.</i></a><br></center>
+        		</p>
+        		<p>
+        		    <center><button id="RefreshUsers" name="RefreshUsers" class="btn btn-info">Refresh Page</button></center>
         		</p>
               {% endif %}
 
@@ -108,7 +112,7 @@ $(document).ready(function () {
 
     async function auth() {
         try {
-            const scopes = ['username', 'payments', 'roles'];
+            const scopes = ['username', 'payments', 'roles', 'wallet_address'];
             function onIncompletePaymentFound(payment) { };
 
             Pi.authenticate(scopes, onIncompletePaymentFound).then(function (auth) {
@@ -125,7 +129,7 @@ $(document).ready(function () {
 
     async function authenticate() {
         try {
-            const scopes = ['username', 'payments', 'roles'];
+            const scopes = ['username', 'payments', 'roles', 'wallet_address'];
             function onIncompletePaymentFound(payment) { };
 
             Pi.authenticate(scopes, onIncompletePaymentFound).then(function (authenticate) {
@@ -176,9 +180,7 @@ $(document).ready(function () {
 		  onError: function(error, payment) { console.log('Payment Error') },
 		});
 	    } catch(err) {
-
 		console.log(err);
-		// Technic
 		}
 	}
 
