@@ -2,6 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
+from flask_ckeditor import CKEditor
 
 from flaskeddit.config import Config
 
@@ -10,6 +11,7 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "danger"
 mail = Mail()
+ckeditor = CKEditor()
 
 def create_app(config=Config):
     """
@@ -29,6 +31,8 @@ def create_app(config=Config):
     app.config['MAIL_USE_TLS'] = Config.mail_use_tls
     app.config['MAIL_USE_SSL'] = Config.mail_use_ssl
     mail = Mail(app)
+    
+    ckeditor.init_app(app)
 
     from flaskeddit.auth import auth_blueprint
     from flaskeddit.communities import communities_blueprint
