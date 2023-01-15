@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import IntegerField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
+from flask_ckeditor import CKEditorField
 
 from flaskeddit.models import Post
 
@@ -9,7 +10,7 @@ class PostForm(FlaskForm):
     """Form for creating a new post."""
 
     title = StringField("Title", validators=[DataRequired()])
-    post = TextAreaField("Post", validators=[DataRequired()])
+    post = CKEditorField("Post", validators=[DataRequired()])
     community_id = IntegerField("Community Id", validators=[DataRequired()])
     submit = SubmitField("Create")
 
@@ -30,5 +31,5 @@ class PostForm(FlaskForm):
 class UpdatePostForm(FlaskForm):
     """Form for updating a post."""
 
-    post = TextAreaField("Post", validators=[DataRequired()])
+    post = CKEditorField("Post", validators=[DataRequired()])
     submit = SubmitField("Create")
