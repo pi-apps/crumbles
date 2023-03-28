@@ -25,8 +25,6 @@ Based on [flaskeddit](https://github.com/aqche/flaskeddit) by - **aqche** - [aqc
 
 These instructions will get you a copy of the project up and running on your local machine for development. See deployment for notes on how to deploy the project.
 
-Visit the [demo](https://hascyll.pythonanywhere.com) to see a live system.
-
 ### Prerequisites
 
 To run this application you need [Python](https://www.python.org/), [pip](https://pip.pypa.io/en/stable/), and [SQLite](https://www.sqlite.org/).
